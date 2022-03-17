@@ -4,10 +4,10 @@ provider "google" {
   region  = "us-central1"
   zone    = "us-central1-c"
 }
+
 resource "google_compute_network" "vpc_network" {
   name = "terraform-network"
 }
-
 terraform {
   backend "gcs" {
     bucket      = "terraformtest120220316"
