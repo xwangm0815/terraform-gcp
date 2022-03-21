@@ -11,7 +11,7 @@ data "terraform_remote_state" "rt" {
   workspace = terraform.workspace
   config = {
     bucket      = "$gcsbucket"
-    prefix      = "terraform/statedev"
+    prefix      = "terraform/state"
     credentials = "terraform-key.json"
   }
 }
