@@ -1,4 +1,6 @@
 variable "project" {
+  type        = string
+  description = "GCP project ID"
   default = "terraform-course-344403"
 }
 
