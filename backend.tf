@@ -1,7 +1,7 @@
 terraform {
   backend "gcs" {
-    bucket      = "terraformtest120220316"
-    prefix      = "terraform1"
+    bucket  = "$gcsbucket"
+    prefix  = "terraform/state"
     credentials = "terraform-key.json"
   }
 }
@@ -10,8 +10,8 @@ data "terraform_remote_state" "rt" {
   backend   = "gcs"
   workspace = terraform.workspace
   config = {
-    bucket      = "terraform_rstate_20220317"
-    prefix      = "dev"
+    bucket      = "$gcsbucket"
+    prefix      = "terraform/statedev"
     credentials = "terraform-key.json"
   }
 }
