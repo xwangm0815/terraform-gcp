@@ -1,7 +1,7 @@
 variable "project" {
   type        = string
   description = "GCP project ID"
-  default = "terraform-course-344403"
+  default = "YOUR_TF_PROJ"
 }
 
 variable "vpc_network_name" {

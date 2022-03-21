@@ -1,7 +1,7 @@
 #!/bin/sh
 
 export TF_CREDS=../terraform-key.json
-export TF_PROJ=terraform-course-344403
+export TF_PROJ=YOUR_TF_PROJ
 export TF_SA_NAME=terraform-sa
 
 sa_rnd=`echo $RANDOM`

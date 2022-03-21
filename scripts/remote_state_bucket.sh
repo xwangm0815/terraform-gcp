@@ -1,6 +1,6 @@
 #!/bin/sh
 
-export TF_PROJ=terraform-course-344403
+export TF_PROJ=YOUR_TF_PROJ
 export TF_BE_RS=terraform-be-rstate
 
 GCS_CLASS="multi_regional"
