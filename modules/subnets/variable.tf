@@ -1,44 +1,20 @@
 
-variable "vpc_network_name" {
+variable "project_id" {
+  description = "The ID of the project where subnets will be created"
+}
+
+variable "network_name" {
   type        = string
   description = "vpc network name"
-  default     = "terraform-network"
 }
 
-variable "subnet_name" {
-  type        = string
-  description = "sub network name"
-}
-variable "region" {
-  default = "us-central1"
+variable "subnets" {
+  type        = list(map(string))
+  description = "The list of subnets being created"
 }
 
-# define vpc region
-variable "vpc_region" {
-  type        = string
-  description = "VPC region"
-  default     = "us-central1"
-}
-
-# define vpc zone
-variable "vpc_zone" {
-  type        = string
-  description = "VPC zone"
-  default     = "us-central1-c"
-}
-
-variable "zone" {
-  default = "us-central1-c"
-}
-
-variable "cidr_ip" {
-  type        = string
-  description = "The CIDR for the network subnet"
-  default     = "10.0.0.0/16"
-}
-
-variable "network-subnet-cidr" {
-  type        = string
-  description = "The CIDR for the network subnet"
-  default     = "10.0.0.0/16"
+variable "secondary_ranges" {
+  type        = map(list(object({ range_name = string, ip_cidr_range = string })))
+  description = "Secondary ranges that will be used in some of the subnets"
+  default     = {}
 }

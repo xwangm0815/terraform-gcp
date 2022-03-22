@@ -9,8 +9,8 @@ variable "network_name" {
 
 variable "routing_mode" {
   type        = string
-  default     = "GLOBAL"
   description = "The network routing mode (default 'GLOBAL')"
+  default     = "GLOBAL"
 }
 
 variable "shared_vpc_host" {

@@ -1,12 +1,10 @@
 variable "project_id" {
   type        = string
   description = "The GCP project ID"
-  default     = null
 }
 
 variable "hostname" {
   description = "Hostname prefix for instances"
-  default     = "default"
 }
 
 variable "mig_name" {

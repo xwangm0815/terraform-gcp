@@ -10,43 +10,60 @@ variable "project_id" {
 }
 
 variable "vpc_name" {
-  type = string
+  type        = string
   description = "vpc name"
 }
 
 variable "subnet_name" {
-    type = string
-    description = "subnet name"
-  
-}
-
-variable "vpc_zone" {
   type        = string
-  description = "vpc zone"
-  default     = "us-central1-c"
+  description = "subnet name"
 }
 
 variable "subnet_zone" {
   description = "subnet zone"
-  type = string
+  type        = string
 }
 
 variable "name_prefix" {
   description = "instance name prefix"
-  type = string
+  type        = string
 }
 
 variable "region" {
   description = "The GCP region"
   type        = string
-  default     = "us-central1"
 }
 
-# variable "service_account" {
-#   default = null
-#   type = object({
-#     email  = string
-#     scopes = set(string)
-#   })
-#   description = "Service account to attach to the instance. See https://www.terraform.io/docs/providers/google/r/compute_instance_template.html#service_account."
-# }
+variable "min_cpu_platform" {
+  description = "Specifies a minimum CPU platform. Applicable values are the friendly names of CPU platforms, such as Intel Haswell or Intel Skylake. See the complete list: https://cloud.google.com/compute/docs/instances/specify-min-cpu-platform"
+  type        = string
+  default     = null
+}
+
+variable "can_ip_forward" {
+  description = "Enable IP forwarding, for NAT instances for example"
+  default     = "false"
+}
+
+variable "tags" {
+  type        = list(string)
+  description = "Network tags, provided as a list"
+  default     = []
+}
+
+variable "labels" {
+  type        = map(string)
+  description = "Labels, provided as a map"
+  default     = {}
+}
+
+variable "startup_script" {
+  description = "User startup script to run when instances spin up"
+  default     = ""
+}
+
+variable "metadata" {
+  type        = map(string)
+  description = "Metadata, provided as a map"
+  default     = {}
+}

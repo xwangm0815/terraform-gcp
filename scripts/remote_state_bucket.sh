@@ -31,5 +31,4 @@ cat > tf_backend_gcs.out  << EOF
     bucket  = "${rs_name}"
 EOF
 
-sed -i -e "s|\$gcsbucket|${rs_name}|g" ../backend.tf
 cat tf_backend_gcs.out

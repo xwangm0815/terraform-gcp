@@ -7,9 +7,9 @@ module "startup-script-lib" {
   name         = var.instance_name
   machine_type = var.linux_instance_type
   zone         = var.subnet_zone
-  tags         = ["ssh","http","http-server", "https-server"]
+  tags         = var.tags
 
-  # metadata_startup_script =file("${path.module}/startup.sh")f
+  metadata_startup_script =file("${path.module}/start.sh")
   
   boot_disk {
     initialize_params {

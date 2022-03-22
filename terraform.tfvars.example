@@ -1,0 +1,10 @@
+project               = "terraform-course-344403"
+vpc_network_name      = "terraform-network"
+subnetwork_name       = "terraform-subnet"
+vpc_region            = "us-central1"
+region_zone           = "us-central1-c"
+network-subnet-cidr   = "10.1.0.0/16"
+network-subnet2-cidr  = "10.2.0.0/16"
+service_port          = 80
+service_port_name     = "http"
+target_size           = 1

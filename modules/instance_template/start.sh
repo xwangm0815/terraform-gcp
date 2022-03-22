@@ -1,3 +1,5 @@
+#! /bin/bash
+
 sudo yum update -y
 sudo cat <<EOF >> /etc/yum.repos.d/nginx.repo
 [nginx]

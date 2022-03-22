@@ -1,41 +1,40 @@
-# Allow http
-resource "google_compute_firewall" "allow-http" {
-  name    = "nginx-fw-allow-http"
-  network = var.vpc_network_name
-  project = var.project_id
 
-  allow {
-    protocol = "tcp"
-    ports    = ["80"]
+
+resource "google_compute_firewall" "rules" {
+  for_each                = { for r in var.rules : r.name => r }
+  name                    = each.value.name
+  description             = each.value.description
+  direction               = each.value.direction
+  network                 = var.network_name
+  project                 = var.project_id
+  source_ranges           = each.value.direction == "INGRESS" ? each.value.ranges : null
+  destination_ranges      = each.value.direction == "EGRESS" ? each.value.ranges : null
+  source_tags             = each.value.source_tags
+  source_service_accounts = each.value.source_service_accounts
+  target_tags             = each.value.target_tags
+  target_service_accounts = each.value.target_service_accounts
+  priority                = each.value.priority
+
+  dynamic "log_config" {
+    for_each = lookup(each.value, "log_config") == null ? [] : [each.value.log_config]
+    content {
+      metadata = log_config.value.metadata
+    }
   }
 
-  source_ranges = ["0.0.0.0/0"]
-  target_tags   = ["http", "http-server"]
-}
-
-# Allow https
-resource "google_compute_firewall" "allow-https" {
-  name    = "nginx-fw-allow-https"
-  network = var.vpc_network_name
-  project = var.project_id
-
-  allow {
-    protocol = "tcp"
-    ports    = ["443"]
+  dynamic "allow" {
+    for_each = lookup(each.value, "allow", [])
+    content {
+      protocol = allow.value.protocol
+      ports    = lookup(allow.value, "ports", null)
+    }
   }
 
-  source_ranges = ["0.0.0.0/0"]
-  target_tags   = ["https", "https-server"]
-}
-
-# allow ssh
-resource "google_compute_firewall" "allow-ssh" {
-  name    = "nginx-fw-allow-ssh"
-  network = var.vpc_network_name
-  allow {
-    protocol = "tcp"
-    ports    = ["22"]
+  dynamic "deny" {
+    for_each = lookup(each.value, "deny", [])
+    content {
+      protocol = deny.value.protocol
+      ports    = lookup(deny.value, "ports", null)
+    }
   }
-  source_ranges = ["0.0.0.0/0"]
-  target_tags   = ["ssh", "https-server"]
 }

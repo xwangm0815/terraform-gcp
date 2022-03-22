@@ -1,0 +1,3 @@
+bucket  = "terraform-course-344403-terraform-be-rstate"
+prefix  = "terraform/state"
+credentials = "terraform-key.json"
