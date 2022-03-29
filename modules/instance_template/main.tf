@@ -25,8 +25,9 @@ resource "google_compute_instance_template" "tpl" {
   }
 
   network_interface {
+    subnetwork_project = "${var.project_id}"
     network    = var.vpc_name
-    subnetwork = var.subnet_name
+    subnetwork = "${var.subnet_name}"
     access_config {}
   }
   lifecycle {
