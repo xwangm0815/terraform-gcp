@@ -37,11 +37,11 @@ resource "google_compute_backend_service" "default" {
   for_each         = var.backends
   project          = var.project
   name             = "${var.name}-backend"
-  port_name        = "http-port-80"
-  protocol         = "HTTP"
+  port_name        = lookup(each.value, "port_name", "http-port-80") 
+  protocol         = lookup(each.value, "protocol", "HTTP")
   health_checks    = [google_compute_health_check.default.id]
   timeout_sec      = 10
-  description      = "http backend service"
+  description      = lookup(each.value, "description", null)
   session_affinity = "NONE"
 
   dynamic "backend" {
@@ -72,7 +72,7 @@ resource "google_compute_backend_service" "default" {
 }
 
 resource "google_compute_health_check" "default" {
-  name = "health-check"
+  name = var.healthcheck_name
 
   http_health_check {
     port = 80

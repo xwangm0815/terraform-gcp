@@ -26,135 +26,53 @@ module "firewall-rules" {
   depends_on   = [module.vpc]
   project_id   = var.project
   network_name = var.vpc_network_name
-
-  rules = [{
-    name        = "nginx-allow-http"
-    description = null
-    direction   = "INGRESS"
-    priority    = null
-
-    source_service_accounts = null
-    target_service_accounts = null
-    ranges                  = ["0.0.0.0/0"]
-    source_tags             = null
-    target_tags             = ["http", "http-server"]
-
-    allow = [{
-      protocol = "tcp"
-      ports    = ["80"]
-    }]
-    deny = []
-    log_config = {
-      metadata = "INCLUDE_ALL_METADATA"
-    }
-    },
-    {
-      name        = "nginx-allow-https"
-      description = null
-      direction   = "INGRESS"
-      priority    = null
-
-      source_service_accounts = null
-      target_service_accounts = null
-      ranges                  = ["0.0.0.0/0"]
-      source_tags             = null
-      target_tags             = ["http", "http-server"]
-
-      allow = [{
-        protocol = "tcp"
-        ports    = ["443"]
-      }]
-      deny = []
-      log_config = {
-        metadata = "INCLUDE_ALL_METADATA"
-      }
-    },
-    {
-      name        = "nginx-allow-ssh"
-      description = null
-      direction   = "INGRESS"
-      priority    = null
-
-      source_service_accounts = null
-      target_service_accounts = null
-      ranges                  = ["0.0.0.0/0"]
-      source_tags             = null
-      target_tags             = ["ssh", "https-server"]
-
-      allow = [{
-        protocol = "tcp"
-        ports    = ["22"]
-      }]
-      deny = []
-      log_config = {
-        metadata = "INCLUDE_ALL_METADATA"
-      }
-  }]
+  rules        = var.firewall_rules
 }
-
-# ## VM instance
-# #module "vm_instance_rhel_public1" {
-# #  source        = "./modules/vm-instance/"
-# #  depends_on    = [module.network_subnet]
-# #  vpc_name      = var.vpc_network_name
-# #  subnet_name   = var.subnetwork_name
-# #  subnet_zone   = var.region_zone
-# #  instance_name = "rhel-instance1"
-# #}
-
-# # module "vm_instance_rhel_public2" {
-# #   source        = "./modules/vm-instance/"
-# #   depends_on    = [module.network_subnet]
-# #   vpc_name      = var.vpc_network_name
-# #   subnet_name   = var.subnetwork_name
-# #   subnet_zone   = var.region_zone
-# #   instance_name = "rhel-instance2"
-# # }
 
 module "instance_template" {
   source         = "./modules/instance_template"
   depends_on     = [module.network_subnet]
   project_id     = var.project
-  name_prefix    = "rhel-template"
   vpc_name       = var.vpc_network_name
   subnet_name    = var.subnetwork_name
   region         = var.vpc_region
   subnet_zone    = var.region_zone
-  tags           = ["ssh", "http", "http-server", "https-server"]
-  startup_script = file("./modules/instance_template/start.sh")
+  startup_script = file(var.instance_templates.startup_script)
+  template       = var.instance_templates
 }
 
 module "mig1" {
   source            = "./modules/mig"
   project_id        = var.project
-  region            = var.vpc_region
-  target_size       = var.target_size
-  hostname          = "nginx1"
+  region            = var.instance_group.region
+  target_size       = var.instance_group.target_size
+  hostname          = "${var.instance_group.host_name}-2"
   instance_template = module.instance_template.self_link
 }
 
 module "mig2" {
   source            = "./modules/mig"
   project_id        = var.project
-  region            = var.vpc_region
-  target_size       = var.target_size
-  hostname          = "nginx2"
+  region            = var.instance_group.region
+  target_size       = var.instance_group.target_size
+  hostname          = "${var.instance_group.host_name}-1"
   instance_template = module.instance_template.self_link
 }
 
 module "gce-lb-http" {
-  source = "./modules/lb-http"
-  name   = "nginx-http-lb"
-  project = var.project
-  target_tags = ["nginx_backend"]
+  source      = "./modules/lb-http"
+  name        = var.backend.name
+  project     = var.project
+  target_tags = var.backend.target_tags
+  healthcheck_name = var.healthcheck_name
 
   backends = {
     default = {
 
-      description                     = null
-      protocol                        = "HTTP"
-      port                            = 80
-      port_name                       = "http"
+      description                     = var.backend.description
+      protocol                        = var.backend.protocol
+      port                            = var.backend.port
+      port_name                       = var.backend.portname
       timeout_sec                     = 10
       connection_draining_timeout_sec = null
       enable_cdn                      = false
@@ -183,29 +101,29 @@ module "gce-lb-http" {
       groups = [
         {
           group                        = module.mig1.instance_group
-          balancing_mode               = null
-          capacity_scaler              = null
-          description                  = null
-          max_connections              = null
-          max_connections_per_instance = null
-          max_connections_per_endpoint = null
-          max_rate                     = null
-          max_rate_per_instance        = null
-          max_rate_per_endpoint        = null
-          max_utilization              = null
+          balancing_mode               = var.backend_group.balancing_mode
+          capacity_scaler              = var.backend_group.capacity_scaler
+          description                  = var.backend_group.description
+          max_connections              = var.backend_group.max_connections
+          max_connections_per_instance = var.backend_group.max_connections_per_instance
+          max_connections_per_endpoint = var.backend_group.max_connections_per_endpoint
+          max_rate                     = var.backend_group.max_rate
+          max_rate_per_instance        = var.backend_group.max_rate_per_instance
+          max_rate_per_endpoint        = var.backend_group.max_rate_per_endpoint
+          max_utilization              = var.backend_group.max_utilization
         },
         {
           group                        = module.mig2.instance_group
-          balancing_mode               = null
-          capacity_scaler              = null
-          description                  = null
-          max_connections              = null
-          max_connections_per_instance = null
-          max_connections_per_endpoint = null
-          max_rate                     = null
-          max_rate_per_instance        = null
-          max_rate_per_endpoint        = null
-          max_utilization              = null
+          balancing_mode               = var.backend_group.balancing_mode
+          capacity_scaler              = var.backend_group.capacity_scaler
+          description                  = var.backend_group.description
+          max_connections              = var.backend_group.max_connections
+          max_connections_per_instance = var.backend_group.max_connections_per_instance
+          max_connections_per_endpoint = var.backend_group.max_connections_per_endpoint
+          max_rate                     = var.backend_group.max_rate
+          max_rate_per_instance        = var.backend_group.max_rate_per_instance
+          max_rate_per_endpoint        = var.backend_group.max_rate_per_endpoint
+          max_utilization              = var.backend_group.max_utilization
         },
       ]
 

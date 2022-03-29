@@ -64,15 +64,9 @@ variable "target_service_accounts" {
   default     = []
 }
 
-# variable "backend1" {
-#   description = "List of target service accounts for health check firewall rule. Exactly one of target_tags or target_service_accounts should be specified."
-#   type        = string
-# }
-
-# variable "backend2" {
-#   description = "List of target service accounts for health check firewall rule. Exactly one of target_tags or target_service_accounts should be specified."
-#   type        = string
-# }
+variable healthcheck_name {
+  type = string
+}
 
 variable "backends" {
   description = "Map backend indices to list of backend maps."

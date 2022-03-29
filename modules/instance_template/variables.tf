@@ -1,8 +1,3 @@
-variable "linux_instance_type" {
-  type        = string
-  description = "VM instance type for Linux Server"
-  default     = "e2-small"
-}
 
 variable "project_id" {
   type        = string
@@ -24,10 +19,7 @@ variable "subnet_zone" {
   type        = string
 }
 
-variable "name_prefix" {
-  description = "instance name prefix"
-  type        = string
-}
+variable "template" {}
 
 variable "region" {
   description = "The GCP region"
@@ -43,12 +35,6 @@ variable "min_cpu_platform" {
 variable "can_ip_forward" {
   description = "Enable IP forwarding, for NAT instances for example"
   default     = "false"
-}
-
-variable "tags" {
-  type        = list(string)
-  description = "Network tags, provided as a list"
-  default     = []
 }
 
 variable "labels" {
