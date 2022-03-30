@@ -1,3 +1,4 @@
+
 project              = "terraform-course-344403"
 vpc_network_name     = "terraform-network"
 subnetwork_name      = "terraform-subnet"
@@ -9,17 +10,22 @@ service_port         = 80
 service_port_name    = "http"
 target_size          = 1
 
+gcp_service_list = [
+  "cloudresourcemanager.googleapis.com",
+  "compute.googleapis.com",
+  "iap.googleapis.com"
+]
 
 firewall_rules = [{
-  name                    = "nginx-allow-http"
+  name                    = "nginx-allow-lb-and-healthcheck"
   description             = null
   direction               = "INGRESS"
   priority                = null
   source_service_accounts = null
   target_service_accounts = null
-  ranges                  = ["0.0.0.0/0"]
+  ranges                  = ["130.211.0.0/22", "35.191.0.0/16"]
   source_tags             = null
-  target_tags             = ["http", "http-server"]
+  target_tags             = null
 
   allow = [{
     protocol = "tcp"
@@ -38,9 +44,9 @@ firewall_rules = [{
 
     source_service_accounts = null
     target_service_accounts = null
-    ranges                  = ["0.0.0.0/0"]
+    ranges                  = ["130.211.0.0/22", "35.191.0.0/16"]
     source_tags             = null
-    target_tags             = ["http", "http-server"]
+    target_tags             = null
 
     allow = [{
       protocol = "tcp"
@@ -52,16 +58,17 @@ firewall_rules = [{
     }
   },
   {
-    name        = "nginx-allow-ssh"
+    name        = "nginx-iap-inbound-ssh"
     description = null
     direction   = "INGRESS"
     priority    = null
 
+    # source_service_accounts = [module.instance_template.sa_email]
     source_service_accounts = null
     target_service_accounts = null
-    ranges                  = ["0.0.0.0/0"]
+    ranges                  = ["35.235.240.0/20"]
     source_tags             = null
-    target_tags             = ["ssh", "https-server"]
+    target_tags             = null
 
     allow = [{
       protocol = "tcp"
@@ -111,4 +118,4 @@ backend_group = {
   max_utilization              = null
 }
 
-healthcheck_name    = "nginx-health-check"
+healthcheck_name = "nginx-health-check"
