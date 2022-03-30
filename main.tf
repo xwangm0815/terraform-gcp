@@ -1,7 +1,15 @@
+#Enable services in GCP Project.
+resource "google_project_service" "gcp_services" {
+  count = length(var.gcp_service_list)
+  project                    = var.project
+  service                    = var.gcp_service_list[count.index]
+  disable_dependent_services = true
+}
 
 ## create VPC
 module "vpc" {
   source       = "./modules/vpc/"
+  depends_on   = [google_project_service.gcp_services]
   project_id   = var.project
   network_name = var.vpc_network_name
 }
@@ -9,7 +17,7 @@ module "vpc" {
 ## create subnet
 module "network_subnet" {
   source       = "./modules/subnets/"
-  depends_on   = [module.vpc]
+  depends_on   = [google_project_service.gcp_services, module.vpc]
   project_id   = var.project
   network_name = var.vpc_network_name
   subnets = [{
@@ -23,7 +31,7 @@ module "network_subnet" {
 ## create firewall rules
 module "firewall-rules" {
   source       = "./modules/firewall-rules/"
-  depends_on   = [module.vpc]
+  depends_on   = [module.vpc, module.gce-lb-http, google_project_service.gcp_services]
   project_id   = var.project
   network_name = var.vpc_network_name
   rules        = var.firewall_rules
@@ -31,8 +39,8 @@ module "firewall-rules" {
 
 module "instance_template" {
   source         = "./modules/instance_template"
-  depends_on     = [module.network_subnet]
-  project_id     = var.project
+  depends_on     = [google_project_service.gcp_services, module.network_subnet]
+  project        = var.project
   vpc_name       = var.vpc_network_name
   subnet_name    = var.subnetwork_name
   region         = var.vpc_region
@@ -43,15 +51,7 @@ module "instance_template" {
 
 module "mig1" {
   source            = "./modules/mig"
-  project_id        = var.project
-  region            = var.instance_group.region
-  target_size       = var.instance_group.target_size
-  hostname          = "${var.instance_group.host_name}-2"
-  instance_template = module.instance_template.self_link
-}
-
-module "mig2" {
-  source            = "./modules/mig"
+  depends_on        = [google_project_service.gcp_services]
   project_id        = var.project
   region            = var.instance_group.region
   target_size       = var.instance_group.target_size
@@ -59,11 +59,23 @@ module "mig2" {
   instance_template = module.instance_template.self_link
 }
 
+module "mig2" {
+  source            = "./modules/mig"
+  depends_on        = [google_project_service.gcp_services]
+  project_id        = var.project
+  region            = var.instance_group.region
+  target_size       = var.instance_group.target_size
+  hostname          = "${var.instance_group.host_name}-2"
+  instance_template = module.instance_template.self_link
+}
+
+
 module "gce-lb-http" {
-  source      = "./modules/lb-http"
-  name        = var.backend.name
-  project     = var.project
-  target_tags = var.backend.target_tags
+  source           = "./modules/lb-http"
+  depends_on        = [google_project_service.gcp_services]
+  name             = var.backend.name
+  project          = var.project
+  target_tags      = var.backend.target_tags
   healthcheck_name = var.healthcheck_name
 
   backends = {
@@ -135,5 +147,4 @@ module "gce-lb-http" {
     }
   }
 }
-
 
