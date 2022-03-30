@@ -1,5 +1,5 @@
 
-variable "project_id" {
+variable "project" {
   type        = string
   description = "project id"
 }
