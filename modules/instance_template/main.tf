@@ -35,7 +35,6 @@ resource "google_compute_instance_template" "tpl" {
     subnetwork_project = "${var.project}"
     network    = var.vpc_name
     subnetwork = "${var.subnet_name}"
-    access_config {}
   }
 
   service_account {
