@@ -1,10 +1,12 @@
 resource "google_compute_router" "nat" {
+  project = "${var.project}"
   name    = "${var.nat_router_name}"
   region  = "${var.region}"
   network = "${var.network_name}"
 }
 
 resource "google_compute_router_nat" "config" {
+  project                            = "${var.project}"  
   name                               = "${var.nat_router_name}-config"
   router                             = "${google_compute_router.nat.name}"
   region                             = "${var.region}"

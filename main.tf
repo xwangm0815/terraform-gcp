@@ -41,6 +41,7 @@ module "firewall-rules" {
 module "nat-gateway" {
   source     = "./modules/nat/"
   depends_on = [module.vpc, google_project_service.gcp_services]
+  project   = var.project
   network_name = var.vpc_network_name
   nat_router_name = var.nat_router_name
   region          = var.vpc_region

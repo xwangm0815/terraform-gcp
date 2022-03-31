@@ -1,3 +1,8 @@
+variable "project" {
+  type        = string
+  description = "The GCP project ID"
+}
+
 variable "network_name" {
   type        = string
   description = "vpc network name"
