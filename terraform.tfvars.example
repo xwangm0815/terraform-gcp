@@ -63,7 +63,6 @@ firewall_rules = [{
     direction   = "INGRESS"
     priority    = null
 
-    # source_service_accounts = [module.instance_template.sa_email]
     source_service_accounts = null
     target_service_accounts = null
     ranges                  = ["35.235.240.0/20"]
@@ -72,13 +71,14 @@ firewall_rules = [{
 
     allow = [{
       protocol = "tcp"
-      ports    = ["22"]
+      ports    = ["22", "80", "443"]
     }]
     deny = []
     log_config = {
       metadata = "INCLUDE_ALL_METADATA"
     }
-}]
+  },
+]
 
 # Instance Template variables
 instance_templates = {
@@ -119,3 +119,4 @@ backend_group = {
 }
 
 healthcheck_name = "nginx-health-check"
+nat_router_name = "nginx-gateway"

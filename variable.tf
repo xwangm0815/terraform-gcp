@@ -140,8 +140,13 @@ variable "backend_group" {
 ## Health check variables
 variable "healthcheck_name" {
   type = string
+  description = "name of health check"
 }
 
+variable "nat_router_name" {
+    type = string
+    description = "Network NAT gateway name"
+}
 terraform {
   # Optional attributes and the defaults function are
   # both experimental, so we must opt in to the experiment.

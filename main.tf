@@ -1,6 +1,6 @@
 #Enable services in GCP Project.
 resource "google_project_service" "gcp_services" {
-  count = length(var.gcp_service_list)
+  count                      = length(var.gcp_service_list)
   project                    = var.project
   service                    = var.gcp_service_list[count.index]
   disable_dependent_services = true
@@ -21,9 +21,9 @@ module "network_subnet" {
   project_id   = var.project
   network_name = var.vpc_network_name
   subnets = [{
-    subnet_name         = var.subnetwork_name
-    network-subnet-cidr = var.network-subnet-cidr
-    subnet_region       = var.vpc_region
+    subnet_name           = var.subnetwork_name
+    network-subnet-cidr   = var.network-subnet-cidr
+    subnet_region         = var.vpc_region
     subnet_private_access = true
     }
   ]
@@ -36,6 +36,14 @@ module "firewall-rules" {
   project_id   = var.project
   network_name = var.vpc_network_name
   rules        = var.firewall_rules
+}
+
+module "nat-gateway" {
+  source     = "./modules/nat/"
+  depends_on = [module.vpc, google_project_service.gcp_services]
+  network_name = var.vpc_network_name
+  nat_router_name = var.nat_router_name
+  region          = var.vpc_region
 }
 
 module "instance_template" {
@@ -70,10 +78,9 @@ module "mig2" {
   instance_template = module.instance_template.self_link
 }
 
-
 module "gce-lb-http" {
   source           = "./modules/lb-http"
-  depends_on        = [google_project_service.gcp_services]
+  depends_on       = [google_project_service.gcp_services]
   name             = var.backend.name
   project          = var.project
   target_tags      = var.backend.target_tags
