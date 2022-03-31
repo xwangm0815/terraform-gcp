@@ -24,6 +24,7 @@ module "network_subnet" {
     subnet_name         = var.subnetwork_name
     network-subnet-cidr = var.network-subnet-cidr
     subnet_region       = var.vpc_region
+    subnet_private_access = true
     }
   ]
 }
@@ -31,7 +32,7 @@ module "network_subnet" {
 ## create firewall rules
 module "firewall-rules" {
   source       = "./modules/firewall-rules/"
-  depends_on   = [module.vpc, module.gce-lb-http, google_project_service.gcp_services]
+  depends_on   = [module.vpc, google_project_service.gcp_services]
   project_id   = var.project
   network_name = var.vpc_network_name
   rules        = var.firewall_rules
