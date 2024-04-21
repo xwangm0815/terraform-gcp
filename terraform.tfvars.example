@@ -1,0 +1,122 @@
+
+project              = "terraform-course-344403"
+vpc_network_name     = "terraform-network"
+subnetwork_name      = "terraform-subnet"
+vpc_region           = "us-central1"
+region_zone          = "us-central1-c"
+network-subnet-cidr  = "10.1.0.0/16"
+network-subnet2-cidr = "10.2.0.0/16"
+service_port         = 80
+service_port_name    = "http"
+target_size          = 1
+
+gcp_service_list = [
+  "cloudresourcemanager.googleapis.com",
+  "compute.googleapis.com",
+  "iap.googleapis.com"
+]
+
+firewall_rules = [{
+  name                    = "nginx-allow-lb-and-healthcheck"
+  description             = null
+  direction               = "INGRESS"
+  priority                = null
+  source_service_accounts = null
+  target_service_accounts = null
+  ranges                  = ["130.211.0.0/22", "35.191.0.0/16"]
+  source_tags             = null
+  target_tags             = null
+
+  allow = [{
+    protocol = "tcp"
+    ports    = ["80"]
+  }]
+  deny = []
+  log_config = {
+    metadata = "INCLUDE_ALL_METADATA"
+  }
+  },
+  {
+    name        = "nginx-allow-https"
+    description = null
+    direction   = "INGRESS"
+    priority    = null
+
+    source_service_accounts = null
+    target_service_accounts = null
+    ranges                  = ["130.211.0.0/22", "35.191.0.0/16"]
+    source_tags             = null
+    target_tags             = null
+
+    allow = [{
+      protocol = "tcp"
+      ports    = ["443"]
+    }]
+    deny = []
+    log_config = {
+      metadata = "INCLUDE_ALL_METADATA"
+    }
+  },
+  {
+    name        = "nginx-iap-inbound-ssh"
+    description = null
+    direction   = "INGRESS"
+    priority    = null
+
+    source_service_accounts = null
+    target_service_accounts = null
+    ranges                  = ["35.235.240.0/20"]
+    source_tags             = null
+    target_tags             = null
+
+    allow = [{
+      protocol = "tcp"
+      ports    = ["22", "80", "443"]
+    }]
+    deny = []
+    log_config = {
+      metadata = "INCLUDE_ALL_METADATA"
+    }
+  },
+]
+
+# Instance Template variables
+instance_templates = {
+  name_prefix           = "rhel-template"
+  tags                  = ["ssh", "http", "http-server", "https-server"]
+  startup_script        = "./modules/instance_template/start.sh"
+  template_machine_type = "e2-small"
+  source_image          = "rhel-cloud/rhel-8"
+}
+
+instance_group = {
+  region      = "us-central1"
+  target_size = 1
+  host_name   = "nginx"
+}
+
+# backend_service for load balancer
+backend = {
+  name        = "nginx-http-lb"
+  portname    = "http"
+  protocol    = "HTTP"
+  port        = 80
+  target_tags = ["nginx_backend"]
+  description = "http backend service"
+}
+
+backend_group = {
+  balancing_mode               = null
+  capacity_scaler              = null
+  description                  = null
+  max_connections              = null
+  max_connections_per_instance = null
+  max_connections_per_endpoint = null
+  max_rate                     = null
+  max_rate_per_instance        = null
+  max_rate_per_endpoint        = null
+  max_utilization              = null
+}
+
+healthcheck_name = "nginx-health-check"
+nat_router_name = "nginx-gateway"
