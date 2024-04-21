@@ -1,6 +1,7 @@
 
 #Practice merge conflict#
 # this is codes in local branch
+# merge to master
 provider "google" {
   credentials = file("terraform-key.json")
   project = " -course-344403"
