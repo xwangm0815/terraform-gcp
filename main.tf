@@ -1,3 +1,25 @@
+
+#Practice merge conflict#
+# this is codes in local branch
+# merge to master
+provider "google" {
+  credentials = file("terraform-key.json")
+  project = " -course-344403"
+  region  = "us-central1"
+  zone    = "us-central1-c"
+}
+
+resource "google_compute_network" "vpc_network" {
+  name = "terraform-network"
+}
+terraform {
+  backend "gcs" {
+    bucket      = "terraformtest120220316"
+    prefix      = "terraform1"
+    credentials = "terraform-key.json"
+  }
+}
+# end local branch code =======
 #Enable services in GCP Project.
 resource "google_project_service" "gcp_services" {
   count                      = length(var.gcp_service_list)
@@ -156,4 +178,5 @@ module "gce-lb-http" {
     }
   }
 }
+
 
