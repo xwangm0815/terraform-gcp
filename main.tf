@@ -1,3 +1,4 @@
+#change in vs_b002
 
 #Practice merge conflict#
 # this is codes in local branch
