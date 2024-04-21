@@ -1,3 +1,5 @@
+#change in vs_b002
+
 #Enable services in GCP Project.
 resource "google_project_service" "gcp_services" {
   count                      = length(var.gcp_service_list)
